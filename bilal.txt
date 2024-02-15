@@ -1,0 +1,204 @@
+-- index.html --
+
+    <div id="gameCanvas">
+        <div id="character"></div>
+    </div>
+    <div id="score">Score: 0</div>
+    <script src="js/script.js" defer></script>
+
+-- css --
+
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f7f7f7;
+}
+
+#gameCanvas {
+    position: relative;
+    width: 600px;
+    height: 200px;
+    background-color: #eee;
+}
+
+#character {
+    width: 30px;
+    height: 30px;
+    background-color: black;
+    position: absolute;
+    bottom: 0;
+    left: 50px;
+}
+
+.obstacle {
+    width: 20px;
+    height: 20px;
+    background-color: red;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+-- js file --
+
+const character = document.getElementById('character');
+const gameCanvas = document.getElementById('gameCanvas');
+const scoreDisplay = document.getElementById('score');
+
+let velocity = 0;
+let isGameOver = false;
+let score = 0;
+let isJumping = false;
+let jumpDuration = 500; // Duration of the jump animation in milliseconds
+let jumpHeight = 50; // Height of the jump in pixels
+let obstacleSpeed = 5; // Speed of the obstacles
+let obstacleGenerationDelay = 1500; // Delay between obstacle generation in milliseconds
+
+document.addEventListener('keydown', event => {
+    if (event.code === 'Space') {
+        jump();
+        increaseScore();
+    }
+});
+
+function jump() {
+    isJumping = true;
+    let startTime = Date.now(); // Time when the jump started
+
+    function animateJump() {
+        let timeElapsed = Date.now() - startTime;
+        let jumpProgress = timeElapsed / jumpDuration;
+
+        if (jumpProgress >= 1) {
+            // Jump animation complete
+            animateDescent(); // Start descent animation
+            return;
+        }
+
+        let jumpPosition = easeOutQuad(jumpProgress, 0, jumpHeight, 1);
+        character.style.bottom = jumpPosition + 'px';
+
+        requestAnimationFrame(animateJump);
+    }
+
+    animateJump();
+}
+
+function cancelJump() {
+    isJumping = false;
+}
+
+function animateDescent() {
+    let startHeight = parseInt(character.style.bottom);
+    let descentDuration = jumpDuration / 2; // Half of the jump duration for descent
+
+    let startTime = Date.now(); // Time when the descent started
+
+    function animateDescentStep() {
+        let timeElapsed = Date.now() - startTime;
+        let descentProgress = timeElapsed / descentDuration;
+
+        if (descentProgress >= 1) {
+            // Descent animation complete
+            character.style.bottom = '0px'; // Reset character position
+            isJumping = false;
+            return;
+        }
+
+        let descentPosition = easeOutQuad(descentProgress, startHeight, -jumpHeight, 1);
+        character.style.bottom = descentPosition + 'px';
+
+        requestAnimationFrame(animateDescentStep);
+    }
+
+    animateDescentStep();
+}
+
+// Easing function for smoother animation (quadratic ease-out)
+function easeOutQuad(t, b, c, d) {
+    return -c * (t /= d) * (t - 2) + b;
+}
+
+function increaseScore() {
+    score++;
+    scoreDisplay.textContent = "Score: " + score;
+
+    // Check if score is 20 to increase obstacle speed
+    if (score % 10 === 0 && score !== 0) {
+        obstacleSpeed += 2; // Increase obstacle speed
+        obstacleGenerationDelay = 1000; // Decrease delay between obstacle generation
+    }
+}
+
+function generateObstacle() {
+    const obstacle = document.createElement('div');
+    obstacle.className = 'obstacle';
+    obstacle.style.width = '20px';
+    obstacle.style.height = '20px';
+    obstacle.style.backgroundColor = 'red';
+    obstacle.style.position = 'absolute';
+    obstacle.style.bottom = '0px';
+    obstacle.style.right = '0px';
+    gameCanvas.appendChild(obstacle);
+
+    function moveObstacle() {
+        if (!isGameOver) {
+            obstacle.style.right = parseInt(obstacle.style.right) + obstacleSpeed + 'px';
+
+            // Check for collision with character
+            if (isTouching(character, obstacle)) {
+                gameOver();
+            }
+
+            // Remove obstacle if it's out of the screen
+            if (parseInt(obstacle.style.right) > gameCanvas.offsetWidth) {
+                obstacle.remove();
+            } else {
+                requestAnimationFrame(moveObstacle);
+            }
+        }
+    }
+
+    moveObstacle();
+}
+
+function isTouching(elem1, elem2) {
+    let rect1 = elem1.getBoundingClientRect();
+    let rect2 = elem2.getBoundingClientRect();
+
+    // Add a small buffer zone around the elements for smoother collision detection
+    let buffer = 2;
+    return !(
+        rect1.top > rect2.bottom + buffer ||
+        rect1.right < rect2.left - buffer ||
+        rect1.bottom < rect2.top - buffer ||
+        rect1.left > rect2.right + buffer
+    );
+}
+
+function update() {
+    // Character Movement (based on gravity only)
+    character.style.bottom = parseInt(character.style.bottom) + velocity + 'px';
+
+    // Check for collision with ground
+    if (parseInt(character.style.bottom) <= 0) {
+        velocity = 0;
+        character.style.bottom = '0px';
+    }
+
+    // Generate obstacle at regular intervals
+    generateObstacle();
+    setTimeout(update, obstacleGenerationDelay); // Call update again after delay
+}
+
+function gameOver() {
+    isGameOver = true;
+    alert('Game Over! Your score: ' + score);
+    location.reload(); // Reload the page to restart the game
+}
+
+update();

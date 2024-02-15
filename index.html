@@ -4,13 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jumping Game</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="js/script.js" type="module"></script>
 </head>
 <body>
-    <div id="gameCanvas">
-        <div id="character"></div>
-    </div>
-    <div id="score">Score: 0</div>
-    <script src="js/script.js" defer></script>
+  <main>
+    <section class="world" data-world>
+      <div class="score" data-score>0</div>
+      <div class="start-screen" data-start-screen>Press any key to start</div>
+      <img src="images/ground-2.png" alt="Ground" class="ground" data-ground>
+      <img src="images/ground-2.png" alt="Ground" class="ground" data-ground>
+      <img src="images/character-run-1.png" alt="Character" class="character" data-character>
+    </section>
+  </main>
 </body>
 </html>

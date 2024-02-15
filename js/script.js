@@ -1,157 +1,91 @@
-const character = document.getElementById('character');
-const gameCanvas = document.getElementById('gameCanvas');
-const scoreDisplay = document.getElementById('score');
+import { setupGround, updateGround } from './ground.js';
+import { setupCharacter, updateCharacter, getCharacterRect, setCharacterLose } from './character.js';
+import { setupObstacle, updateObstacle, getObstacleRects } from './obstacle.js';
 
-let velocity = 0;
-let isGameOver = false;
-let score = 0;
-let isJumping = false;
-let jumpDuration = 500; // Duration of the jump animation in milliseconds
-let jumpHeight = 50; // Height of the jump in pixels
-let obstacleSpeed = 5; // Speed of the obstacles
-let obstacleGenerationDelay = 1500; // Delay between obstacle generation in milliseconds
+const WORLD_WIDTH = 100;
+const WORLD_HEIGHT = 30;
+const SPEED_SCALE_INCREASE = 0.00001
 
-document.addEventListener('keydown', event => {
-    if (event.code === 'Space') {
-        jump();
-        increaseScore();
-    }
-});
+const worldElem = document.querySelector('[data-world]');
+const scoreElem = document.querySelector('[data-score]');
+const startScreenElem = document.querySelector('[data-start-screen]');
 
-function jump() {
-    isJumping = true;
-    let startTime = Date.now(); // Time when the jump started
+setPixelToWorldScale()
+window.addEventListener("resize", setPixelToWorldScale)
+document.addEventListener("keydown", handleStart, { once: true})
 
-    function animateJump() {
-        let timeElapsed = Date.now() - startTime;
-        let jumpProgress = timeElapsed / jumpDuration;
 
-        if (jumpProgress >= 1) {
-            // Jump animation complete
-            animateDescent(); // Start descent animation
-            return;
-        }
+let lastTime
+let speedScale
+let score
+function update(time) {
+  if (lastTime == null) {
+    lastTime = time
+    window.requestAnimationFrame(update)
+    return
+  }
+  const delta = time - lastTime
+  
+  updateGround(delta, speedScale)
+  updateCharacter(delta, speedScale)
+  updateObstacle(delta, speedScale)
+  updateSpeedScale(delta)
+  updateScore(delta)
+  if (checkLose()) return handleLose()
 
-        let jumpPosition = easeOutQuad(jumpProgress, 0, jumpHeight, 1);
-        character.style.bottom = jumpPosition + 'px';
-
-        requestAnimationFrame(animateJump);
-    }
-
-    animateJump();
+  lastTime = time
+  window.requestAnimationFrame(update)
 }
 
-function cancelJump() {
-    isJumping = false;
+function checkLose() {
+  const characterRect = getCharacterRect()
+  return getObstacleRects().some(rect => isCollision(rect, characterRect))
 }
 
-function animateDescent() {
-    let startHeight = parseInt(character.style.bottom);
-    let descentDuration = jumpDuration / 2; // Half of the jump duration for descent
-
-    let startTime = Date.now(); // Time when the descent started
-
-    function animateDescentStep() {
-        let timeElapsed = Date.now() - startTime;
-        let descentProgress = timeElapsed / descentDuration;
-
-        if (descentProgress >= 1) {
-            // Descent animation complete
-            character.style.bottom = '0px'; // Reset character position
-            isJumping = false;
-            return;
-        }
-
-        let descentPosition = easeOutQuad(descentProgress, startHeight, -jumpHeight, 1);
-        character.style.bottom = descentPosition + 'px';
-
-        requestAnimationFrame(animateDescentStep);
-    }
-
-    animateDescentStep();
+function isCollision(rect1, rect2) {
+  return (
+    rect1.left < rect2.right && 
+    rect1.top < rect2.bottom && 
+    rect1.right > rect2.left && 
+    rect1.bottom > rect2.top
+  )
 }
 
-// Easing function for smoother animation (quadratic ease-out)
-function easeOutQuad(t, b, c, d) {
-    return -c * (t /= d) * (t - 2) + b;
+function updateSpeedScale(delta) {
+  speedScale += delta * SPEED_SCALE_INCREASE
 }
 
-function increaseScore() {
-    score++;
-    scoreDisplay.textContent = "Score: " + score;
-
-    // Check if score is 20 to increase obstacle speed
-    if (score % 10 === 0 && score !== 0) {
-        obstacleSpeed += 2; // Increase obstacle speed
-        obstacleGenerationDelay = 1000; // Decrease delay between obstacle generation
-    }
+function updateScore(delta) {
+  score += delta * 0.01
+  scoreElem.textContent = 'Score: ' + Math.floor(score)
 }
 
-function generateObstacle() {
-    const obstacle = document.createElement('div');
-    obstacle.className = 'obstacle';
-    obstacle.style.width = '20px';
-    obstacle.style.height = '20px';
-    obstacle.style.backgroundColor = 'red';
-    obstacle.style.position = 'absolute';
-    obstacle.style.bottom = '0px';
-    obstacle.style.right = '0px';
-    gameCanvas.appendChild(obstacle);
-
-    function moveObstacle() {
-        if (!isGameOver) {
-            obstacle.style.right = parseInt(obstacle.style.right) + obstacleSpeed + 'px';
-
-            // Check for collision with character
-            if (isTouching(character, obstacle)) {
-                gameOver();
-            }
-
-            // Remove obstacle if it's out of the screen
-            if (parseInt(obstacle.style.right) > gameCanvas.offsetWidth) {
-                obstacle.remove();
-            } else {
-                requestAnimationFrame(moveObstacle);
-            }
-        }
-    }
-
-    moveObstacle();
+function handleStart() {
+  lastTime = null
+  speedScale = 1
+  score = 0
+  setupGround()
+  setupCharacter()
+  setupObstacle()
+  startScreenElem.classList.add("hide")
+  window.requestAnimationFrame(update)
 }
 
-function isTouching(elem1, elem2) {
-    let rect1 = elem1.getBoundingClientRect();
-    let rect2 = elem2.getBoundingClientRect();
-
-    // Add a small buffer zone around the elements for smoother collision detection
-    let buffer = 2;
-    return !(
-        rect1.top > rect2.bottom + buffer ||
-        rect1.right < rect2.left - buffer ||
-        rect1.bottom < rect2.top - buffer ||
-        rect1.left > rect2.right + buffer
-    );
+function handleLose() {
+  setCharacterLose()
+  setTimeout(() => {
+    document.addEventListener("keydown", handleStart, {once: true})
+    startScreenElem.classList.remove("hide")
+  }, 100);
 }
 
-function update() {
-    // Character Movement (based on gravity only)
-    character.style.bottom = parseInt(character.style.bottom) + velocity + 'px';
-
-    // Check for collision with ground
-    if (parseInt(character.style.bottom) <= 0) {
-        velocity = 0;
-        character.style.bottom = '0px';
-    }
-
-    // Generate obstacle at regular intervals
-    generateObstacle();
-    setTimeout(update, obstacleGenerationDelay); // Call update again after delay
+function setPixelToWorldScale() {
+  let worldToPixelScale
+  if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH
+  } else {
+    worldToPixelScale = window.innerHeight / WORLD_HEIGHT
+  }
+  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
+  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
 }
-
-function gameOver() {
-    isGameOver = true;
-    alert('Game Over! Your score: ' + score);
-    location.reload(); // Reload the page to restart the game
-}
-
-update();
