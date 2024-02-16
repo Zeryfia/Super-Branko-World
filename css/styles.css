@@ -65,7 +65,6 @@ body {
     bottom: 0;
 }
 
-/* Add styles for the lose screen */
 .lose-screen {
     position: fixed;
     top: 50%;
