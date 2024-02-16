@@ -10,7 +10,8 @@ body {
     align-items: center;
     min-height: 100vh;
     background-image: url(../images/body-background.png);
-    background-image: cover;
+    background-size: 100% 100%; 
+    background-repeat: no-repeat;
 }
 
 

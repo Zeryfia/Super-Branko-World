@@ -5,6 +5,8 @@ const JUMP_SPEED = 0.45
 const GRAVITY = 0.0014
 const CHR_FRAME_COUNT = 3
 const FRAME_TIME = 100
+const jumpSound = new Audio('../Sounds/Mario Jump Sound Effect.mp3');
+
 
 let isJumping = false
 let chrFrame = 0
@@ -29,6 +31,7 @@ export function getCharacterRect() {
 
 export function setCharacterLose() {
   characterElem.src = "../images/character-lose.png"
+  document.removeEventListener("keydown", move);
 }
 
 function resetCharacter() {
@@ -59,6 +62,8 @@ function handleJump(delta) {
     return
   }
 
+  jumpSound.play();
+
   incrementCustomProperty(characterElem, "--bottom", yVelocity * delta)
   
   if (getCustomProperty(characterElem, "--bottom") <= 6) {
@@ -81,10 +86,6 @@ function onJump(e) {
 function move(e) {
 
   let current = null;
-
-  // current = getCustomProperty(characterElem, "--left");
-
-  // console.log("This is the current position " + current);
 
   if( e.code === 'ArrowRight' ) {
 

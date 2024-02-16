@@ -13,6 +13,8 @@ const loseScreenElem = document.querySelector('[data-lose-screen]');
 const replayButton = document.querySelector('[data-replay-button]');
 const scoreDisplay = document.querySelector('[data-score-display]');
 const highestScoreDisplay = document.querySelector('[data-highest-score]');
+const deathSound = new Audio('../Sounds/Mario Death  Sound Effect HD.mp3');
+const milestoneSound = new Audio('../Sounds/Mario Bros Life up Sound Effect.mp3');
 
 setPixelToWorldScale();
 window.addEventListener("resize", setPixelToWorldScale);
@@ -70,6 +72,7 @@ function updateScore(delta) {
   }
 }
 
+
 function updateHighestScore() {
   highestScoreDisplay.textContent = Math.floor(highestScore);
 }
@@ -79,6 +82,7 @@ function handleStart() {
   speedScale = 1;
   score = 0;
   scoreElem.textContent = 'Score: ' + Math.floor(score);
+  playBackgroundMusic();
   setupGround();
   setupCharacter();
   setupObstacle();
@@ -92,9 +96,11 @@ function handleStart() {
 
 function handleLose() {
   setCharacterLose();
+  stopBackgroundMusic();
   scoreDisplay.textContent = 'Score: ' + Math.floor(score);
   loseScreenElem.classList.remove("hide");
   updateHighestScore();
+  deathSound.play();
 }
 
 function setPixelToWorldScale() {
@@ -108,4 +114,28 @@ function setPixelToWorldScale() {
   worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`;
 }
 
-replayButton.addEventListener('click', handleStart);
+function playBackgroundMusic() {
+  const bgMusic = document.getElementById('bgMusic');
+  bgMusic.play();
+}
+
+function stopBackgroundMusic() {
+  const bgMusic = document.getElementById('bgMusic');
+  bgMusic.pause();
+}
+
+function stopAllSoundEffects() {
+  jumpSound.pause();
+  jumpSound.currentTime = 0;
+  
+  gameOverSound.pause();
+  gameOverSound.currentTime = 0;
+}
+
+
+replayButton.addEventListener('click', () => {
+  handleStart();
+  startBackgroundMusic();
+  stopAllSoundEffects();
+});
+
