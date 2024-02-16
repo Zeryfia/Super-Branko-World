@@ -2,27 +2,23 @@ import { getCustomProperty, incrementCustomProperty, setCustomProperty } from ".
 
 const characterElem = document.querySelector("[data-character]")
 const JUMP_SPEED = 0.45
-const GRAVITY = 0.0015
+const GRAVITY = 0.0014
 const CHR_FRAME_COUNT = 3
 const FRAME_TIME = 100
 
-let isJumping
-let chrFrame
-let currentFrameTime
-let yVelocity
+let isJumping = false
+let chrFrame = 0
+let currentFrameTime = 0
+let yVelocity = 0
 
 export function setupCharacter() {
-  isJumping = false
-  chrFrame = 0
-  currentFrameTime = 0
-  yVelocity = 0
-  setCustomProperty(characterElem, "--bottom", 6)
+  resetCharacter()
   document.removeEventListener("keydown", onJump)
   document.addEventListener("keydown", onJump)
 }
 
 export function updateCharacter(delta, speedScale) {
-  hanldeRun(delta, speedScale)
+  handleRun(delta, speedScale)
   handleJump(delta)
 }
 
@@ -34,7 +30,15 @@ export function setCharacterLose() {
   characterElem.src = "../images/character-lose.png"
 }
 
-function hanldeRun(delta, speedScale) {
+function resetCharacter() {
+  isJumping = false
+  chrFrame = 0
+  currentFrameTime = 0
+  yVelocity = 0
+  setCustomProperty(characterElem, "--bottom", 6)
+}
+
+function handleRun(delta, speedScale) {
   if (isJumping) {
     characterElem.src = `../images/character-run-0.png`
     return
@@ -64,7 +68,9 @@ function handleJump(delta) {
 }
 
 function onJump(e) {
-  if ( e.code !== "Space" || isJumping ) return
+  if (e.code !== "Space" || isJumping) {
+    return
+  }
 
   yVelocity = JUMP_SPEED
   isJumping = true

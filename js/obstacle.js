@@ -5,7 +5,9 @@ const OBSTACLE_INTERVAL_MIN = 400;
 const OBSTACLE_INTERVAL_MAX = 3000;
 const worldElement = document.querySelector("[data-world]");
 
-let nextObstacleTime
+let nextObstacleTime;
+let obstacleDelay = 0;
+
 export function setupObstacle() {
   nextObstacleTime = OBSTACLE_INTERVAL_MIN;
   document.querySelectorAll("[data-obstacle]").forEach(obstacle => {
@@ -21,11 +23,19 @@ export function updateObstacle(delta, speedScale) {
     }
   })
 
-  if (nextObstacleTime <= 0) {
-    createObstacle()
-    nextObstacleTime = randomNumberBetween(OBSTACLE_INTERVAL_MIN, OBSTACLE_INTERVAL_MAX) / speedScale
+  if (obstacleDelay > 0) {
+    obstacleDelay -= delta;
   }
-  nextObstacleTime -= delta
+
+  if (obstacleDelay <= 0) {
+    if (nextObstacleTime <= 0) {
+      createObstacle()
+      nextObstacleTime = randomNumberBetween(OBSTACLE_INTERVAL_MIN, OBSTACLE_INTERVAL_MAX) / speedScale
+
+      obstacleDelay = 500;
+    }
+    nextObstacleTime -= delta;
+  }
 }
 
 export function getObstacleRects() {

@@ -4,42 +4,47 @@ import { setupObstacle, updateObstacle, getObstacleRects } from './obstacle.js';
 
 const WORLD_WIDTH = 100;
 const WORLD_HEIGHT = 30;
-const SPEED_SCALE_INCREASE = 0.00001
+const SPEED_SCALE_INCREASE = 0.00001;
 
 const worldElem = document.querySelector('[data-world]');
 const scoreElem = document.querySelector('[data-score]');
 const startScreenElem = document.querySelector('[data-start-screen]');
+const loseScreenElem = document.querySelector('[data-lose-screen]');
+const replayButton = document.querySelector('[data-replay-button]');
+const scoreDisplay = document.querySelector('[data-score-display]');
+const highestScoreDisplay = document.querySelector('[data-highest-score]');
 
-setPixelToWorldScale()
-window.addEventListener("resize", setPixelToWorldScale)
-document.addEventListener("keydown", handleStart, { once: true})
+setPixelToWorldScale();
+window.addEventListener("resize", setPixelToWorldScale);
+document.addEventListener("keydown", handleStart, { once: true });
 
+let lastTime;
+let speedScale;
+let score;
+let highestScore = parseInt(localStorage.getItem('highestScore')) || 0;
 
-let lastTime
-let speedScale
-let score
 function update(time) {
   if (lastTime == null) {
-    lastTime = time
-    window.requestAnimationFrame(update)
-    return
+    lastTime = time;
+    window.requestAnimationFrame(update);
+    return;
   }
-  const delta = time - lastTime
+  const delta = time - lastTime;
   
-  updateGround(delta, speedScale)
-  updateCharacter(delta, speedScale)
-  updateObstacle(delta, speedScale)
-  updateSpeedScale(delta)
-  updateScore(delta)
-  if (checkLose()) return handleLose()
+  updateGround(delta, speedScale);
+  updateCharacter(delta, speedScale);
+  updateObstacle(delta, speedScale);
+  updateSpeedScale(delta);
+  updateScore(delta);
+  if (checkLose()) return handleLose();
 
-  lastTime = time
-  window.requestAnimationFrame(update)
+  lastTime = time;
+  window.requestAnimationFrame(update);
 }
 
 function checkLose() {
-  const characterRect = getCharacterRect()
-  return getObstacleRects().some(rect => isCollision(rect, characterRect))
+  const characterRect = getCharacterRect();
+  return getObstacleRects().some(rect => isCollision(rect, characterRect));
 }
 
 function isCollision(rect1, rect2) {
@@ -48,44 +53,59 @@ function isCollision(rect1, rect2) {
     rect1.top < rect2.bottom && 
     rect1.right > rect2.left && 
     rect1.bottom > rect2.top
-  )
+  );
 }
 
 function updateSpeedScale(delta) {
-  speedScale += delta * SPEED_SCALE_INCREASE
+  speedScale += delta * SPEED_SCALE_INCREASE;
 }
 
 function updateScore(delta) {
-  score += delta * 0.01
-  scoreElem.textContent = 'Score: ' + Math.floor(score)
+  score += delta * 0.01;
+  scoreElem.textContent = 'Score: ' + Math.floor(score);
+  if (score > highestScore) {
+    highestScore = score;
+    localStorage.setItem('highestScore', Math.floor(highestScore));
+    updateHighestScore();
+  }
+}
+
+function updateHighestScore() {
+  highestScoreDisplay.textContent = Math.floor(highestScore);
 }
 
 function handleStart() {
-  lastTime = null
-  speedScale = 1
-  score = 0
-  setupGround()
-  setupCharacter()
-  setupObstacle()
-  startScreenElem.classList.add("hide")
-  window.requestAnimationFrame(update)
+  lastTime = null;
+  speedScale = 1;
+  score = 0;
+  scoreElem.textContent = 'Score: ' + Math.floor(score);
+  setupGround();
+  setupCharacter();
+  setupObstacle();
+  startScreenElem.classList.add("hide");
+  loseScreenElem.classList.add("hide");
+  localStorage.removeItem('highestScore');
+  updateHighestScore();
+  window.requestAnimationFrame(update);
 }
 
+
 function handleLose() {
-  setCharacterLose()
-  setTimeout(() => {
-    document.addEventListener("keydown", handleStart, {once: true})
-    startScreenElem.classList.remove("hide")
-  }, 100);
+  setCharacterLose();
+  scoreDisplay.textContent = 'Score: ' + Math.floor(score);
+  loseScreenElem.classList.remove("hide");
+  updateHighestScore();
 }
 
 function setPixelToWorldScale() {
-  let worldToPixelScale
+  let worldToPixelScale;
   if (window.innerWidth / window.innerHeight < WORLD_WIDTH / WORLD_HEIGHT) {
-    worldToPixelScale = window.innerWidth / WORLD_WIDTH
+    worldToPixelScale = window.innerWidth / WORLD_WIDTH;
   } else {
-    worldToPixelScale = window.innerHeight / WORLD_HEIGHT
+    worldToPixelScale = window.innerHeight / WORLD_HEIGHT;
   }
-  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`
-  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`
+  worldElem.style.width = `${WORLD_WIDTH * worldToPixelScale}px`;
+  worldElem.style.height = `${WORLD_HEIGHT * worldToPixelScale}px`;
 }
+
+replayButton.addEventListener('click', handleStart);

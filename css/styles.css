@@ -64,3 +64,41 @@ body {
     height: 20%;
     bottom: 0;
 }
+
+/* Add styles for the lose screen */
+.lose-screen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+  
+.lose-content {
+    color: white;
+}
+  
+.score-display {
+    margin-bottom: 10px;
+}
+  
+.highest-score {
+    margin-bottom: 10px;
+}
+  
+.replay-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
+.replay-button:hover {
+    background-color: #45a049;
+}
+  
