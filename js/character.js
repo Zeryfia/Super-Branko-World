@@ -15,6 +15,7 @@ export function setupCharacter() {
   resetCharacter()
   document.removeEventListener("keydown", onJump)
   document.addEventListener("keydown", onJump)
+  document.addEventListener("keydown", move);
 }
 
 export function updateCharacter(delta, speedScale) {
@@ -36,6 +37,7 @@ function resetCharacter() {
   currentFrameTime = 0
   yVelocity = 0
   setCustomProperty(characterElem, "--bottom", 6)
+  setCustomProperty(characterElem, "--left", 0);
 }
 
 function handleRun(delta, speedScale) {
@@ -74,4 +76,28 @@ function onJump(e) {
 
   yVelocity = JUMP_SPEED
   isJumping = true
+}
+
+function move(e) {
+
+  let current = null;
+
+  // current = getCustomProperty(characterElem, "--left");
+
+  // console.log("This is the current position " + current);
+
+  if( e.code === 'ArrowRight' ) {
+
+   current = getCustomProperty(characterElem, "--left");
+
+    if( current < 90 )
+    setCustomProperty(characterElem, "--left", current+=4);
+  }
+
+  else if ( e.code === 'ArrowLeft' )
+  {
+    current = getCustomProperty(characterElem, "--left");
+    if( current > 0 )
+    setCustomProperty(characterElem, "--left", current-=4);
+  }
 }
