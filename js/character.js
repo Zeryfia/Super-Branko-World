@@ -5,7 +5,7 @@ const JUMP_SPEED = 0.45
 const GRAVITY = 0.0015
 const CHR_FRAME_COUNT = 3
 const FRAME_TIME = 100
-const jumpSound = new Audio('../Sounds/Mario Jump Sound Effect.mp3');
+const jumpSound = new Audio('./Sounds/Mario Jump Sound Effect.mp3');
 
 
 let isJumping = false
@@ -30,7 +30,7 @@ export function getCharacterRect() {
 }
 
 export function setCharacterLose() {
-  characterElem.src = "../images/character-lose.png"
+  characterElem.src = "./images/character-lose.png"
   document.removeEventListener("keydown", move);
 }
 
@@ -45,13 +45,13 @@ function resetCharacter() {
 
 function handleRun(delta, speedScale) {
   if (isJumping) {
-    characterElem.src = `../images/character-run-0.png`
+    characterElem.src = './images/character-run-0.png';
     return
   }
 
   if (currentFrameTime >= FRAME_TIME) {
     chrFrame = (chrFrame + 1) % CHR_FRAME_COUNT
-    characterElem.src = `../images/character-run-${chrFrame}.png`
+    characterElem.src = `./images/character-run-${chrFrame}.png`;
     currentFrameTime -= FRAME_TIME
   }
   currentFrameTime += delta * speedScale

@@ -50,8 +50,8 @@ function createObstacle() {
   const listOb = ['tag','div'];
   let random = Math.floor(Math.random()*listOb.length);
   let currentOb = listOb[random];
-  const pictures = [ {name: 'tag', src: `../images/obstacle.png`}, {name: 'div', src: `../images/div.png`}];
-  // `${process.env.https://zeryfia.github.io/}../images/obstacle.png}'
+  const pictures = [ {name: 'tag', src: './images/obstacle.png'}, {name: 'div', src: './images/div.png'}];
+  
   let temp = pictures.filter(item => item.name === `${currentOb}`);
   obstacle.src = temp[0].src;
   obstacle.classList.add("obstacle");
