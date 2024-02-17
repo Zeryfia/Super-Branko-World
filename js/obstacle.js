@@ -45,12 +45,17 @@ export function getObstacleRects() {
 }
 
 function createObstacle() {
-  const obstacle = document.createElement("img")
-  obstacle.dataset.obstacle = true
-  obstacle.src = "../images/obstacle.png"
-  obstacle.classList.add("obstacle")
-  setCustomProperty(obstacle, "--left", 100)
-  worldElement.append(obstacle)
+  const obstacle = document.createElement("img");
+  obstacle.dataset.obstacle = true;
+  const listOb = ['tag','div'];
+  let random = Math.floor(Math.random()*listOb.length);
+  let currentOb = listOb[random];
+  const pictures = [ {name: 'tag', src: '../images/obstacle.png'}, {name: 'div', src: '../images/div.png'}];
+  let temp = pictures.filter(item => item.name === `${currentOb}`);
+  obstacle.src = temp[0].src;
+  obstacle.classList.add("obstacle");
+  setCustomProperty(obstacle, "--left", 100);
+  worldElement.append(obstacle);
 }
 
 function randomNumberBetween(min, max) {
