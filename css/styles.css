@@ -14,7 +14,6 @@ body {
     background-repeat: no-repeat;
 }
 
-
 .world {
     overflow: hidden;
     position: relative;
@@ -103,3 +102,29 @@ body {
     background-color: #45a049;
 }
   
+.start-screen {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.start-screen h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #da1900;
+}
+
+.start-screen h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: aqua;
+}
+
+.start-screen article {
+    font-size: 16px;
+    line-height: 1.5;
+}
