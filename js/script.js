@@ -132,7 +132,6 @@ function stopAllSoundEffects() {
   gameOverSound.currentTime = 0;
 }
 
-
 replayButton.addEventListener('click', () => {
   handleStart();
   startBackgroundMusic();

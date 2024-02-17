@@ -2,7 +2,7 @@ import { getCustomProperty, incrementCustomProperty, setCustomProperty } from ".
 
 const characterElem = document.querySelector("[data-character]")
 const JUMP_SPEED = 0.45
-const GRAVITY = 0.0014
+const GRAVITY = 0.0015
 const CHR_FRAME_COUNT = 3
 const FRAME_TIME = 100
 const jumpSound = new Audio('../Sounds/Mario Jump Sound Effect.mp3');
@@ -40,7 +40,7 @@ function resetCharacter() {
   currentFrameTime = 0
   yVelocity = 0
   setCustomProperty(characterElem, "--bottom", 6)
-  setCustomProperty(characterElem, "--left", 0);
+  setCustomProperty(characterElem, "--left", 10);
 }
 
 function handleRun(delta, speedScale) {
@@ -75,7 +75,7 @@ function handleJump(delta) {
 }
 
 function onJump(e) {
-  if (e.code !== "Space" || isJumping) {
+  if ((e.code !== "Space" && e.code !== "ArrowUp") || isJumping) {
     return
   }
 
