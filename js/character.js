@@ -5,7 +5,7 @@ const JUMP_SPEED = 0.45
 const GRAVITY = 0.0015
 const CHR_FRAME_COUNT = 3
 const FRAME_TIME = 100
-const jumpSound = new Audio('./Sounds/Mario_Jump_Sound_Effect.mp3');
+const jumpSound = new Audio('./Sounds/Mario Jump Sound Effect.mp3');
 
 
 let isJumping = false
