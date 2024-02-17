@@ -13,10 +13,10 @@ const loseScreenElem = document.querySelector('[data-lose-screen]');
 const replayButton = document.querySelector('[data-replay-button]');
 const scoreDisplay = document.querySelector('[data-score-display]');
 const highestScoreDisplay = document.querySelector('[data-highest-score]');
-const deathSound = new Audio('../Sounds/Mario_Death_Sound_Effect_HD.mp3');
-const milestoneSound = new Audio('../Sounds/Mario_Bros_Life_up_Sound_Effect.mp3');
-const jumpSound = new Audio('../Sounds/Mario_Jump_Sound_Effect.mp3');
-const gameOverSound = new Audio('../Sounds/Mario_Death_Sound_Effect_HD.mp3');
+const deathSound = new Audio('./Sounds/Mario_Death_Sound_Effect_HD.mp3');
+const milestoneSound = new Audio('./Sounds/Mario_Bros_Life_up_Sound_Effect.mp3');
+const jumpSound = new Audio('./Sounds/Mario_Jump_Sound_Effect.mp3');
+const gameOverSound = new Audio('./Sounds/Mario_Death_Sound_Effect_HD.mp3');
 
 setPixelToWorldScale();
 window.addEventListener("resize", setPixelToWorldScale);
